@@ -138,4 +138,9 @@ router ospf
 log file /var/log/frr/frr.log
 default-information originate always
 ```
-Аналогично настраивается конфиг на **router2** и **router3**, изменяя соответствующие IP-адреса и router-id.
+Аналогично настраивается конфиг на **router2** и **router3**, изменяя соответствующие IP-адреса и router-id, и перезапустим FRR:
+```bash
+systemct restart frr 
+systemctl enable frr
+```
+
