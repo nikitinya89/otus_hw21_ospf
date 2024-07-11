@@ -143,4 +143,11 @@ default-information originate always
 systemct restart frr 
 systemctl enable frr
 ```
+После этого на роутерах должны появиться дополнительные маршруты:  
+
+![routes](routes.jpg)  
+
+Убедимся, что подсети *192.168.20.0/24* и *192.168.30.0/24* доступны с **router1**:  
+
+![ping](ping.jpg)
 
