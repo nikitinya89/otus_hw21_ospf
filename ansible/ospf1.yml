@@ -1,0 +1,61 @@
+- name: OSPF
+  hosts: all
+  become: yes
+  tasks:
+    - name: install net tools
+      apt:
+        name:
+          - traceroute
+          - tcpdump
+          - net-tools
+        state: present
+        update_cache: true
+
+    - name: add FRR repo
+      ansible.builtin.apt_key:
+        url: "https://deb.frrouting.org/frr/keys.asc"
+        state: present
+
+    - name:
+      ansible.builtin.apt_repository:
+        repo: "deb https://deb.frrouting.org/frr {{ ansible_distribution_release }} frr-stable"
+        state: present
+        filename: "frr.list"
+
+    - name: installl FRR
+      apt:
+        name:
+          - frr
+          - frr-pythontools
+        state: present
+        update_cache: true
+
+    - name: enable IP forwarding
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: true
+        state: present
+        reload: true
+
+    - name: copy frr daemons config
+      template:
+        src: daemons
+        dest: /etc/frr/daemons
+        owner: frr
+        group: frr
+        mode: '0640'
+
+    - name: copy frr.conf
+      template:
+        src: frr.conf.j2
+        dest: /etc/frr/frr.conf
+        owner: frr
+        group: frr
+        mode: '0640'
+
+    - name: restart frr daemon
+      systemd:
+        name: frr
+        state: restarted
+        enabled: true

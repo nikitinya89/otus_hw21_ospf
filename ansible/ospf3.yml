@@ -1,0 +1,17 @@
+- name: OSPF
+  hosts: all
+  become: yes
+  tasks:
+    - name: copy frr.conf
+      template:
+        src: frr.conf3.j2
+        dest: /etc/frr/frr.conf
+        owner: frr
+        group: frr
+        mode: '0640'
+
+    - name: restart frr daemon
+      systemd:
+        name: frr
+        state: restarted
+        enabled: true

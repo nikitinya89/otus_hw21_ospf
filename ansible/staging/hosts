@@ -1,0 +1,4 @@
+[routers]
+router1 ansible_host=192.168.56.11 router_id=1.1.1.1 neighbor1=10.0.10.2 neighbor2=10.0.12.2
+router2 ansible_host=192.168.56.12 router_id=2.2.2.2 neighbor1=10.0.10.1 neighbor2=10.0.11.1
+router3 ansible_host=192.168.56.13 router_id=3.3.3.3 neighbor1=10.0.11.2 neighbor2=10.0.12.1
