@@ -151,3 +151,57 @@ systemctl enable frr
 
 ![ping](ping.jpg)
 
+Чтобы выполнить настройку с помощью **ansible**, запустим плэйбук:
+
+```bash
+ansible-playbook ospf1.yml
+```
+
+### Ассимметричный роутинг
+Для настройки ассиметричного роутинга необходимо отключить блокировку ассиметричной маршрутизации:
+```bash
+sysctl net.ipv4.conf.all.rp_filter=0
+```
+Изменим стоимость интерфейса *enp0s8* на **router1**:
+```bash
+vtysh
+
+router1# conf t
+router1(config)# int enp0s8
+router1(config-if)# ip ospf cost 1000
+router1(config-if)# exit
+router1(config)# exit
+```
+Теперь запустим пинг с внутренного интерфейса **router1** до локальной сети **router2**:
+```bash
+ping -I 192.168.10.1 192.168.20.1
+```
+Так как стоимость маршрута до **router2** через интерфейс *enp0s8* увеличилась, ICMP-запрос пойдет через интерфейс *enp0s9* и **router3**, но ICMP-ответ придет на *enp0s8*.
+
+Убедимся в этом, запустив tcdump сначала на *enp0s9*, а затем на *enp0s9* **router2**:
+
+![icmp1](icmp1.jpg)
+
+Чтобы настроить ассиметричный роутинг с помощью **ansible**, запустим плэйбук:
+```bash
+ansible-playbook ospf2.yml
+```
+### Симметричный роутинг с дорогим линком
+Для того, чтобы вернуть симметрию, увеличим также стоимость интерфейса *enp0s8* на **router2**:
+```bash
+vtysh
+
+router1# conf t
+router1(config)# int enp0s8
+router1(config-if)# ip ospf cost 1000
+router1(config-if)# exit
+router1(config)# exit
+```
+Так как интерфейс *enp0s8* также подорожал, то теперь и ICMP-ответ тоже пойдет в обход через интерфейс *enp0s9* и **router3** по более дешевому маршруту. Убедимся в этом, выполнив трассировку:  
+  
+![icmp2](icmp2.jpg)  
+  
+Для настройки с помощью **ansible**, запустим плэйбук:
+```bash
+ansible-playbook ospf3.yml
+```
